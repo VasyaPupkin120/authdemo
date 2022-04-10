@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <title>Личный кабинет</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style type="text/css">
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: ghostwhite;
+            }
+            input {
+                display: block;
+                font-size: 18px;
+                padding: 15px;
+                margin-bottom: 10px;
+                width: 100%;
+                outline: none;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            form {
+                width: 90%;
+                max-width: 350px;
+                min-width: 250px;
+
+            }
+            .placeholder {
+                flex: 1
+            }
+
+        </style>
+
+
+    <script type="text/javascript">
+
+        // глобальный обработчик события - ожидание окончания загрузки dom-дерева
+        document.addEventListener("DOMContentLoaded", function(){
+
+                    //вывод приветствия в консоль
+                    console.log("hello!");
+
+                    // выбор кнопки ввода, настройка цвета кнопки ввода
+                    let btn = document.querySelector("input[type=submit]");
+                    btn.style.backgroundColor = "yellow";
+
+                    // добавление обработчкика события - щелчок по кнопке, передача в функцию-обработчик объекта события
+                    // маркировка функции-обработчика асинхронной - содержит асинхронный код await
+                    btn.addEventListener('click', async function(event){
+
+                                // перехват поведения объекта, связанного с событием (конопки, связнанной с щелчком)
+                                // и предотвращение действий по умолчанию - предотвращение передачи данных из формы на бэк
+                                event.preventDefault();
+
+                                // тестовое получение данных из формы и вывод их в консоль
+                                let username = document.querySelector("input[name='username']").value;
+                                let password = document.querySelector("input[name='password']").value;
+                                console.log(username, password);
+
+                                // создание запроса и сохранние ответа от сервера, запрос асинхронный, метод - post
+                                // передются данные типа FormData (именно такие ожидает бэк), вытащенные из полей формы ввода js-ом
+                                // тип ответа - данные в json-формате, так настроен бэк
+                                //let response = await fetch("/login", {
+                                        //method: "POST",
+                                        //body: new FormData(document.querySelector('form'))
+                                //});
+
+                                // а теперь попробуем передать данные на сервер вторым способом - в теле запроса
+                                // с помощью вручную собранного json. Апострофы `` - аналог f-строк Python'а,
+                                // можно подставлять переменные. username и password получены из полей ввода чуть выше
+                            
+                                let data_dict = `{"username": "${username}", "password": "${password}"}`;
+                                let response = await fetch("/login", {
+                                        method: "POST",
+                                        body: data_dict,
+                                        headers: {"Content-Type": "application/json"}
+                                });
+                                console.log(data_dict);
+
+                                // выборка из ответа собственно тела ответа - данных в формате json 
+                                // в добавок автоматический парсинг этих данных в словарь и тестовый вывод
+                                let response_json = await response.json();
+                                console.log(response_json);
+
+                                // так как ответ - json-данные, то на основе ключа succes делается вывод об том каков ответ
+                                // и производится настройка стилей и полная замена dom-дерева страницы на тело, переданное
+                                // в json под ключом message
+                                if (response_json.sucess){
+                                            let body = document.querySelector("body");
+                                            body.style.backgroundColor = "green";
+                                            body.style.display = "block";
+                                            body.innerHTML = response_json.message;
+
+
+                                }
+                    })
+        })
+
+    </script>
+    </head>
+    <body>
+        <div class="placeholder"></div>
+        <form method="post" action="/login">
+            <input type="text" name="username"/>
+            <input type="password" name="password"/>
+            <input type="submit" value="Войти"/>
+        </form>
+        <div class="placeholder"></div>
+    </body>
+</html>
