@@ -42,12 +42,9 @@
         // глобальный обработчик события - ожидание окончания загрузки dom-дерева
         document.addEventListener("DOMContentLoaded", function(){
 
-                    //вывод приветствия в консоль
-                    console.log("hello!");
-
                     // выбор кнопки ввода, настройка цвета кнопки ввода
                     let btn = document.querySelector("input[type=submit]");
-                    btn.style.backgroundColor = "yellow";
+                    //btn.style.backgroundColor = "yellow";
 
                     // добавление обработчкика события - щелчок по кнопке, передача в функцию-обработчик объекта события
                     // маркировка функции-обработчика асинхронной - содержит асинхронный код await
@@ -57,22 +54,14 @@
                                 // и предотвращение действий по умолчанию - предотвращение передачи данных из формы на бэк
                                 event.preventDefault();
 
-                                // тестовое получение данных из формы и вывод их в консоль
+                                // получение данных из формы 
                                 let username = document.querySelector("input[name='username']").value;
                                 let password = document.querySelector("input[name='password']").value;
-                                console.log(username, password);
-
-                                // создание запроса и сохранние ответа от сервера, запрос асинхронный, метод - post
-                                // передются данные типа FormData (именно такие ожидает бэк), вытащенные из полей формы ввода js-ом
-                                // тип ответа - данные в json-формате, так настроен бэк
-                                //let response = await fetch("/login", {
-                                        //method: "POST",
-                                        //body: new FormData(document.querySelector('form'))
-                                //});
 
                                 // а теперь попробуем передать данные на сервер вторым способом - в теле запроса
                                 // с помощью вручную собранного json. Апострофы `` - аналог f-строк Python'а,
                                 // можно подставлять переменные. username и password получены из полей ввода чуть выше
+                                // первый способ - через FormData смотреть либо в конспекте, либо в старых коммитах
                             
                                 let data_dict = `{"username": "${username}", "password": "${password}"}`;
                                 let response = await fetch("/login", {
@@ -80,12 +69,10 @@
                                         body: data_dict,
                                         headers: {"Content-Type": "application/json"}
                                 });
-                                console.log(data_dict);
-
+                            
                                 // выборка из ответа собственно тела ответа - данных в формате json 
                                 // в добавок автоматический парсинг этих данных в словарь и тестовый вывод
                                 let response_json = await response.json();
-                                console.log(response_json);
 
                                 // так как ответ - json-данные, то на основе ключа succes делается вывод об том каков ответ
                                 // и производится настройка стилей и полная замена dom-дерева страницы на тело, переданное
@@ -94,10 +81,20 @@
                                             let body = document.querySelector("body");
                                             body.style.backgroundColor = "green";
                                             body.style.display = "block";
+                                            body.style.padding = "8px";
                                             body.innerHTML = response_json.message;
 
 
+                                } else {
+                                            let body = document.querySelector("body");
+                                            body.style.backgroundColor = "red";
+                                            body.style.display = "block";
+                                            body.style.padding = "8px";
+                                            body.innerHTML = response_json.message;
+
                                 }
+
+                                    
                     })
         })
 
